@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory
+import mandrill
 app = Flask(__name__)
 
 @app.route('/')
@@ -8,7 +9,12 @@ def index():
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
   # TODO send email
-  pass
+  try:
+    mandrill_client = mandrill.Mandrill('hx5qZ-I25AcaGr16tpCU2Q')
+    return mandrill_client.users.ping()
+  except Mandrill.Error, e:
+    print 'A mandrill error occurred: %s - %s' % (e.__class__, e)
+    raise
 
 @app.route('/<path:filename>')
 def resources(filename):
