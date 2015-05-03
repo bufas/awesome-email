@@ -1,11 +1,11 @@
-import awesome_mailer
+import mailer
 import unittest
 
 class AwesomeMailerTestCase(unittest.TestCase):
 
   def setUp(self):
-    awesome_mailer.app.config['TESTING'] = True
-    self.app = awesome_mailer.app.test_client()
+    mailer.app.config['TESTING'] = True
+    self.app = mailer.app.test_client()
 
   def tearDown(self):
     pass
