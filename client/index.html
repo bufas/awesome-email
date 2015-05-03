@@ -11,29 +11,29 @@
 
     <div class="container">
 
-      <form>
+      <form id="email">
         <div class="row">
           <div class="six columns">
             <label for="input_from">From</label>
-            <input class="u-full-width" type="email" placeholder="" id="input_from">
+            <input name="EMAIL_FROM" class="u-full-width" type="email" placeholder="" id="input_from">
           </div>
 
           <div class="six columns">
             <label for="input_to">To</label>
-            <input class="u-full-width" type="email" placeholder="" id="input_to">
+            <input name="EMAIL_TO" class="u-full-width" type="email" placeholder="" id="input_to">
           </div>
         </div>
 
         <div class="row">
           <div class="twelve columns">
             <label for="input_subject">Subject</label>
-            <input class="u-full-width" type="text" placeholder="" id="input_subject">
+            <input name="EMAIL_SUBJECT" class="u-full-width" type="text" placeholder="" id="input_subject">
           </div>
         </div>
 
         <label for="input_message">Message</label>
-        <textarea class="u-full-width" placeholder="" id="input_message"></textarea>
-        
+        <textarea name="EMAIL_MESSAGE" class="u-full-width" placeholder="" id="input_message"></textarea>
+
         <input class="button-primary" type="submit" value="Submit">
       </form>
 
