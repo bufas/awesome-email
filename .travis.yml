@@ -1,10 +1,12 @@
 language: python
 python:
-  - "2.7"
-# command to install dependencies
-install: 
-  - cd server
-  - pip install -r requirements.txt
-# command to run tests
+- '2.7'
+install:
+- pip install -r requirements.txt
 script:
-  - python tests.py
+- python tests.py
+deploy:
+  provider: heroku
+  api_key:
+    secure: if/n5kZNprU5pePtxvQFRjWdNhO3hhY7I1HYB+9JkfQKKz5JWUebYz9WvuW45Kheq44y03wifgcjzRZuBf3chLz908z4HuujSQlZtQNu8NfDFfB3MhhpRvnZuyDsslwoj/ZuPp0CwympZ9OXUv86vsn2dKlebx5ZaX5OpTH+Fho=
+  app: tranquil-lowlands-1979
