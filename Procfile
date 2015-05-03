@@ -1,0 +1,1 @@
+web: gunicorn awesome-mailer:app
