@@ -2,9 +2,9 @@
 <html>
   <head>
     <title>Send email to everyone!</title>
-    <link type="text/css" rel="stylesheet" href="bower_components/skeleton-css/css/normalize.css">
-    <link type="text/css" rel="stylesheet" href="bower_components/skeleton-css/css/skeleton.css">
-    <link type="text/css" rel="stylesheet" href="res/css/style.css">
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='bower_components/skeleton-css/css/normalize.css')}}">
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='bower_components/skeleton-css/css/skeleton.css')}}">
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
   </head>
 
   <body>
@@ -39,6 +39,6 @@
 
     </div>
 
-    <script type="text/javascript" src="res/js/scripts.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/scripts.js')}}"></script>
   </body>
 </html>
