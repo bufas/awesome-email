@@ -2,12 +2,42 @@
 <html>
   <head>
     <title>Send email to everyone!</title>
+    <link type="text/css" rel="stylesheet" href="bower_components/skeleton-css/css/normalize.css">
+    <link type="text/css" rel="stylesheet" href="bower_components/skeleton-css/css/skeleton.css">
     <link type="text/css" rel="stylesheet" href="res/css/style.css">
   </head>
 
   <body>
 
-    <p>Hello World!</p>
+    <div class="container">
+
+      <form>
+        <div class="row">
+          <div class="six columns">
+            <label for="input_from">From</label>
+            <input class="u-full-width" type="email" placeholder="" id="input_from">
+          </div>
+
+          <div class="six columns">
+            <label for="input_to">To</label>
+            <input class="u-full-width" type="email" placeholder="" id="input_to">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="twelve columns">
+            <label for="input_subject">Subject</label>
+            <input class="u-full-width" type="text" placeholder="" id="input_subject">
+          </div>
+        </div>
+
+        <label for="input_message">Message</label>
+        <textarea class="u-full-width" placeholder="" id="input_message"></textarea>
+        
+        <input class="button-primary" type="submit" value="Submit">
+      </form>
+
+    </div>
 
     <script type="text/javascript" src="res/js/scripts.js"></script>
   </body>

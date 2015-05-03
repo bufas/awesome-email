@@ -1,7 +1,10 @@
 {
-  "name"    : "Uber Challenge",
-  "version" : "0.0.1",
-  "authors" : [
+  "name": "Uber Challenge",
+  "version": "0.0.1",
+  "authors": [
     "Mathias Bak Bertelsen <bufas7@gmail.com>"
-  ]
+  ],
+  "dependencies": {
+    "skeleton-css": "~2.0.4"
+  }
 }
