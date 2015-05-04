@@ -1,11 +1,14 @@
 import mailer
 import unittest
+from mock import Mock
 import json
 
 import mailgunsender as mailgun
 import mandrillsender as mandrill
 
 import utils
+
+from config_test import MANDRILL_API_KEY, MAILGUN_API_KEY
 
 class AwesomeMailerTestCase(unittest.TestCase):
 
@@ -27,10 +30,26 @@ class AwesomeMailerTestCase(unittest.TestCase):
     self.invalidMail1 = 'noathere.com'
     self.invalidMail2 = 'asdf'
 
+    self.providerMandrill = ('mandrillsender', MANDRILL_API_KEY)
+    self.providerMailgun = ('mailgunsender', MAILGUN_API_KEY)
+
   def tearDown(self):
     pass
 
   # Test the utils file
+
+  def test_sendEmailOneProvider(self):
+    res = utils.sendEmails(self.emailData, [self.providerMandrill])
+    self.assertEquals(len(res['successes']), 1)
+    self.assertEquals(len(res['errors']), 0)
+
+  def test_sendEmailMultipleProviders(self):
+    res = utils.sendEmails(self.emailData, [self.providerMandrill, self.providerMailgun])
+    self.assertEquals(len(res['successes']), 1)
+    self.assertEquals(len(res['errors']), 0)
+
+  # TODO test that the second provider is used if the first one errors completely
+  # TODO test that the second provider sends the rest of the emails if the first one only sends part of the mails
 
   def test_sanitizeTooFewArgs(self):
     res = utils.sanitize({})
@@ -102,8 +121,6 @@ class AwesomeMailerTestCase(unittest.TestCase):
     self.assertTrue('reason' in res['errors'][0])
 
   def test_mailgunSender(self):
-    from config_test import MAILGUN_API_KEY
-
     res = mailgun.send(self.emailData, MAILGUN_API_KEY)
     self.assertEqual(len(res['successes']), 1)
     self.assertEqual(len(res['errors']), 0)
@@ -119,9 +136,7 @@ class AwesomeMailerTestCase(unittest.TestCase):
     self.assertTrue('reason' in res['errors'][0])
 
   def test_mandrillSender(self):
-    from config_test import MANDRILL_API_KEY as API_KEY
-
-    res = mandrill.send(self.emailData, API_KEY)
+    res = mandrill.send(self.emailData, MANDRILL_API_KEY)
     self.assertEqual(len(res['successes']), 1)
     self.assertEqual(len(res['errors']), 0)
     self.assertEqual(res['successes'][0], self.emailData['to'][0])
