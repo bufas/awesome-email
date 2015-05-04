@@ -34,4 +34,4 @@ def isValid(data):
   if anyErrors:
     return error
 
-  return True
+  return None

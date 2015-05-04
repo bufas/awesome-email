@@ -46,14 +46,14 @@ class AwesomeMailerTestCase(unittest.TestCase):
 
   def test_validateValidSingleTo(self):
     data = {'from' : self.mail1, 'to' : [self.mail1], 'subject' : '', 'message' : ''}
-    self.assertTrue(utils.isValid(data))
+    self.assertIsNone(utils.isValid(data))
 
   def test_validateValidMultipleTo(self):
     data = {'from' : self.mail1, 
             'to' : [self.mail1, self.mail2, self.mail3], 
             'subject' : '', 
             'message' : ''}
-    self.assertTrue(utils.isValid(data))
+    self.assertIsNone(utils.isValid(data))
 
   def test_validateInvalidEmptyFrom(self):
     data = {'from' : '', 'to' : [self.mail1], 'subject' : '', 'message' : ''}
