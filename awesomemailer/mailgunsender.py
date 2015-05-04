@@ -3,19 +3,23 @@ import requests
 def send(data, apiKey=None):
   receiverString = ','.join(data['to'])
 
-  res = requests.post(
-    'https://api.mailgun.net/v3/sandbox96a16a12ead7492e950f30e4a2feb1fa.mailgun.org/messages',
-    auth=('api', apiKey),
-    data={'from'    : data['from'],
-          'to'      : receiverString,
-          'subject' : data['subject'],
-          'text'    : data['message']})
+  successList = []
+  errorList = []
 
-  if res.status_code == 200:
-    successList = data['to']
-    errorList = []
-  else:
-    successList = []
-    errorList = [{'mail' : mail, 'reason' : res.reason} for mail in data['to']]
+  try:
+    res = requests.post(
+      'https://api.mailgun.net/v3/sandbox96a16a12ead7492e950f30e4a2feb1fa.mailgun.org/messages',
+      auth=('api', apiKey),
+      data={'from'    : data['from'],
+            'to'      : receiverString,
+            'subject' : data['subject'],
+            'text'    : data['message']})
+
+    if res.status_code == 200:
+      successList = data['to']
+    else:
+      errorList = [{'mail' : mail, 'reason' : res.reason} for mail in data['to']]
+  except requests.exceptions.ConnectionError as e:
+    errorList = [{'mail' : mail, 'reason' : 'ConnectionError'} for mail in data['to']]
 
   return {'successes' : successList, 'errors' : errorList}

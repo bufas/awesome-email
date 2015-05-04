@@ -1,7 +1,11 @@
 import mandrill
+import requests
 
 def send(data, apiKey=None):
   acceptedStatuses = ['sent', 'queued', 'scheduled']
+
+  successMails = []
+  errorMails = []
 
   try:
     mandrill_client = mandrill.Mandrill(apiKey)
@@ -16,9 +20,10 @@ def send(data, apiKey=None):
     successMails = [r['email'] for r in result if r['status'] in acceptedStatuses]
     errorMails = [{'mail' : r['email'], 'reason' : r['reject_reason']} 
                   for r in result if r['status'] not in acceptedStatuses]
-                  
-    return {'successes' : successMails, 'errors' : errorMails}
 
   except mandrill.Error as e:
     errorMails = [{'mail' : mail, 'reason' : str(e)} for mail in data['to']]
-    return {'successes' : [], 'errors' : errorMails}
+  except requests.exceptions.ConnectionError as e:
+    errorMails = [{'mail' : mail, 'reason' : 'ConnectionError'} for mail in data['to']]
+
+  return {'successes' : successMails, 'errors' : errorMails}
