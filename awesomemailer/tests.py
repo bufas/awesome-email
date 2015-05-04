@@ -5,6 +5,8 @@ import json
 import mailgunsender as mailgun
 import mandrillsender as mandrill
 
+import utils
+
 class AwesomeMailerTestCase(unittest.TestCase):
 
   def setUp(self):
@@ -18,8 +20,79 @@ class AwesomeMailerTestCase(unittest.TestCase):
       'message' : 'Ligegyldigt indhold'
     })
 
+    self.mail1 = 'email@example.com'
+    self.mail2 = 'my.name@domain.eu'
+    self.mail3 = 'wat7900@aroundtheworld.org'
+    self.mail4 = 'sharklazers@guerillamail.com'
+    self.invalidMail1 = 'noathere.com'
+    self.invalidMail2 = 'asdf'
+
   def tearDown(self):
     pass
+
+  # Test the utils file
+
+  def test_sanitizeTooFewArgs(self):
+    res = utils.sanitize({})
+    self.assertTrue('from' in res)
+    self.assertTrue('to' in res)
+    self.assertTrue('subject' in res)
+    self.assertTrue('message' in res)
+
+  def test_sanitizeEmptyListForTo(self):
+    res = utils.sanitize({})
+    self.assertTrue(type(res['to']) is list)
+    self.assertEqual(len(res['to']), 0)
+
+  def test_validateValidSingleTo(self):
+    data = {'from' : self.mail1, 'to' : [self.mail1], 'subject' : '', 'message' : ''}
+    self.assertTrue(utils.isValid(data))
+
+  def test_validateValidMultipleTo(self):
+    data = {'from' : self.mail1, 
+            'to' : [self.mail1, self.mail2, self.mail3], 
+            'subject' : '', 
+            'message' : ''}
+    self.assertTrue(utils.isValid(data))
+
+  def test_validateInvalidEmptyFrom(self):
+    data = {'from' : '', 'to' : [self.mail1], 'subject' : '', 'message' : ''}
+    res = utils.isValid(data)
+    self.assertTrue('Required' in res['from'])
+
+  def test_validateInvalidEmptyTo(self):
+    data = {'from' : 'from_email@example.com', 'to' : [], 'subject' : '', 'message' : ''}
+    res = utils.isValid(data)
+    self.assertTrue('Required' in res['to'])
+
+  def test_validateInvalidInvalidFrom(self):
+    data = {'from' : self.invalidMail1, 'to' : [self.mail1], 'subject' : '', 'message' : ''}
+    res = utils.isValid(data)
+    self.assertTrue('Invalid email' in res['from'])
+
+  def test_validateInvalidInvalidToAll(self):
+    data = {'from' : self.mail1, 
+            'to' : [self.invalidMail1, self.invalidMail2], 
+            'subject' : '', 
+            'message' : ''}
+    res = utils.isValid(data)
+    self.assertEqual(len(res['to']), 2)
+    self.assertEqual(res['to'][0]['email'], self.invalidMail1)
+    self.assertEqual(res['to'][0]['reason'], 'Invalid email')
+    self.assertEqual(res['to'][1]['email'], self.invalidMail2)
+    self.assertEqual(res['to'][1]['reason'], 'Invalid email')
+
+  def test_validateInvalidInvalidToSubset(self):
+    data = {'from' : self.mail1, 
+            'to' : [self.invalidMail1, self.mail1], 
+            'subject' : '', 
+            'message' : ''}
+    res = utils.isValid(data)
+    self.assertEqual(len(res['to']), 1)
+    self.assertEqual(res['to'][0]['email'], self.invalidMail1)
+    self.assertEqual(res['to'][0]['reason'], 'Invalid email')
+
+  # Test the mailgun adapter
 
   def test_mailgunWrongKey(self):
     res = mailgun.send(self.emailData, 'WRONG API KEY')
@@ -35,6 +108,8 @@ class AwesomeMailerTestCase(unittest.TestCase):
     self.assertEqual(len(res['successes']), 1)
     self.assertEqual(len(res['errors']), 0)
     self.assertEqual(res['successes'][0], self.emailData['to'][0])
+
+  # Test the mandrill adapter
 
   def test_mandrillWrongKey(self):
     res = mandrill.send(self.emailData, 'WRONG API KEY')
