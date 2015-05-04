@@ -1,5 +1,6 @@
-from flask import Flask, send_from_directory, render_template
-import mandrill
+from flask import Flask, send_from_directory, render_template, request, jsonify
+import os
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -8,17 +9,27 @@ def index():
 
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
-  # TODO send email
+
+  info = dict({
+    'from'    : request.form['EMAIL_FROM'],
+    'to'      : request.form['EMAIL_TO'].split(','),
+    'subject' : request.form['EMAIL_SUBJECT'],
+    'message' : request.form['EMAIL_MESSAGE']
+  })
+
   try:
-    mandrill_client = mandrill.Mandrill('hx5qZ-I25AcaGr16tpCU2Q')
-    return mandrill_client.users.ping()
-  except Mandrill.Error, e:
-    print 'A mandrill error occurred: %s - %s' % (e.__class__, e)
-    raise
+    import mandrillsender
+    response = mandrillsender.send(info);
+    return jsonify(response)
+  except:
+    # TODO Try next service
+    pass
+
 
 @app.route('/<path:filename>')
 def resources(filename):
   return send_from_directory('static', filename)
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.config.from_object('config_prod')
+  app.run()
