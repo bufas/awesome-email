@@ -1,8 +1,11 @@
 import mandrill
 
-def send(data):
+def send(data, apiKey=None):
+  if (apiKey is None):
+    raise
+
   try:
-    mandrill_client = mandrill.Mandrill('VJvnDXTPNEiZsuH0mO0c4A')
+    mandrill_client = mandrill.Mandrill(apiKey)
 
     message = dict({
       # 'attachments': [{

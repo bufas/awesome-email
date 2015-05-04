@@ -1,5 +1,6 @@
 from flask import Flask, send_from_directory, render_template, request, jsonify
-import os
+import json
+import sys
 
 app = Flask(__name__)
 
@@ -17,13 +18,21 @@ def send_mail():
     'message' : request.form['EMAIL_MESSAGE']
   })
 
-  try:
-    import mandrillsender
-    response = mandrillsender.send(info);
-    return jsonify(response)
-  except:
-    # TODO Try next service
-    pass
+  # try:
+  #   import mailgunsender
+  #   response = mailgunsender.send(info, apiKey=app.config['MAILGUN_API_KEY'])
+  #   return response
+  # except:
+  #   return json.dumps({'lol' : str(sys.exc_info()[0])})
+  #   pass
+
+  # try:
+  #   import mandrillsender
+  #   response = mandrillsender.send(info, apiKey=app.config['MAILGUN_API_KEY'])
+  #   return jsonify(response)
+  # except:
+  #   # TODO Try next service
+  #   pass
 
 
 @app.route('/<path:filename>')
