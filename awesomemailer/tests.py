@@ -2,6 +2,9 @@ import mailer
 import unittest
 import json
 
+import mailgunsender as mailgun
+import mandrillsender as mandrill
+
 class AwesomeMailerTestCase(unittest.TestCase):
 
   def setUp(self):
@@ -18,19 +21,35 @@ class AwesomeMailerTestCase(unittest.TestCase):
   def tearDown(self):
     pass
 
+  def test_mailgunWrongKey(self):
+    res = mailgun.send(self.emailData, 'WRONG API KEY')
+    self.assertEqual(len(res['successes']), 0)
+    self.assertEqual(len(res['errors']), 1)
+    self.assertTrue('mail' in res['errors'][0])
+    self.assertTrue('reason' in res['errors'][0])
+
   def test_mailgunSender(self):
-    import mailgunsender as mailer
     from config_test import MAILGUN_API_KEY
 
-    res = mailer.send(self.emailData, MAILGUN_API_KEY)
-    assert 'message' in res and res['message'].startswith('Queued.')
+    res = mailgun.send(self.emailData, MAILGUN_API_KEY)
+    self.assertEqual(len(res['successes']), 1)
+    self.assertEqual(len(res['errors']), 0)
+    self.assertEqual(res['successes'][0], self.emailData['to'][0])
+
+  def test_mandrillWrongKey(self):
+    res = mandrill.send(self.emailData, 'WRONG API KEY')
+    self.assertEqual(len(res['successes']), 0)
+    self.assertEqual(len(res['errors']), 1)
+    self.assertTrue('mail' in res['errors'][0])
+    self.assertTrue('reason' in res['errors'][0])
 
   def test_mandrillSender(self):
-    import mandrillsender as mailer
     from config_test import MANDRILL_API_KEY as API_KEY
 
-    res = mailer.send(self.emailData, API_KEY)
-    assert 'status' in res and res['status'].startswith('sent')
+    res = mandrill.send(self.emailData, API_KEY)
+    self.assertEqual(len(res['successes']), 1)
+    self.assertEqual(len(res['errors']), 0)
+    self.assertEqual(res['successes'][0], self.emailData['to'][0])
 
   # def test_mandrillSendMail(self):
   #   emailData = dict({
