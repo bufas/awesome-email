@@ -2,9 +2,9 @@
 import unittest
 from mock import Mock
 import json
-import validation
 
-import utils
+import validation
+from emailhelper import EmailSender
 
 class ValidationTestCase(unittest.TestCase):
   def setUp(self):
@@ -117,7 +117,8 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider = self.makeProviderMock(providerreturn)
     mockimporter = self.makeImporterMock([mockprovider])
 
-    res = utils.sendEmails(dataHandler, [('name', 'key')], mockimporter)
+    sender = EmailSender(dataHandler, [('name', 'key')], importer=mockimporter)
+    res = sender.send()
 
     self.assertEquals(len(res['successes']), 2)
     self.assertEquals(len(res['errors']), 0)
@@ -131,7 +132,8 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider = self.makeProviderMock(providerreturn)
     mockimporter = self.makeImporterMock([mockprovider])
 
-    res = utils.sendEmails(dataHandler, [('name1', 'key'), ('name2', 'key')], mockimporter)
+    sender = EmailSender(dataHandler, [('name1', 'key'), ('name2', 'key')], importer=mockimporter)
+    res = sender.send()
 
     self.assertEquals(len(res['successes']), 2)
 
@@ -147,10 +149,11 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider2 = self.makeProviderMock(providerreturn2)
     mockimporter = self.makeImporterMock([mockprovider1, mockprovider2])
 
-    res = utils.sendEmails(dataHandler, [('name1', 'key'), ('name2', 'key')], mockimporter)
+    sender = EmailSender(dataHandler, [('name1', 'key'), ('name2', 'key')], importer=mockimporter)
+    res = sender.send()
 
-    self.assertEquals(res['senders'][0]['errors'], 2)
-    self.assertEquals(res['senders'][1]['successes'], 2)
+    self.assertEquals(sender.getProviderInfo(name='name1')['errors'], 2)
+    self.assertEquals(sender.getProviderInfo(name='name2')['successes'], 2)
 
 
   def test_sendEmailMultipleProvidersFirstFailsSome(self):
@@ -164,12 +167,15 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider2 = self.makeProviderMock(providerreturn2)
     mockimporter = self.makeImporterMock([mockprovider1, mockprovider2])
 
-    res = utils.sendEmails(dataHandler, [('name1', 'key'), ('name2', 'key')], mockimporter)
+    sender = EmailSender(dataHandler, [('name1', 'key'), ('name2', 'key')], importer=mockimporter)
+    res = sender.send()
 
-    self.assertEquals(res['senders'][0]['successes'], 1)
-    self.assertEquals(res['senders'][0]['errors'], 2)
-    self.assertEquals(res['senders'][1]['successes'], 2)
-    self.assertEquals(res['senders'][1]['errors'], 0)
+    provider1info = sender.getProviderInfo(name='name1')
+    provider2info = sender.getProviderInfo(name='name2')
+    self.assertEquals(provider1info['successes'], 1)
+    self.assertEquals(provider1info['errors'], 2)
+    self.assertEquals(provider2info['successes'], 2)
+    self.assertEquals(provider2info['errors'], 0)
 
 
 # class AwesomeMailerTestCase(unittest.TestCase):
