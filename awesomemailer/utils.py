@@ -1,16 +1,36 @@
 from validate_email import validate_email
 import importlib
 
-def sendEmails(data, providers):
+class CustomProviderImporter:
+  """
+  Imports email providers and returns them. It has the same interface
+  as importlib, which means importlib can simply be used in its place.
+  This is mainly for testing.
+  """
+  def __init__(self):
+    self.importedProviders = {}
+
+  def import_module(self, providerName):
+    # If the provider has been loaded before, just return it
+    if providerName in self.importedProviders:
+      return self.importedProviders[providerName]
+
+    # Load the provider
+    provider = importlib.import_module(providerName)
+    self.importedProviders[providerName] = provider
+    return provider
+
+def sendEmails(data, providers, importer=importlib):
   successfulSends = []
   remainingReceivers = data['to']
   senderInformation = []
 
   for providerName, apiKey in providers:
-    provider = importlib.import_module(providerName)                 # Import the adapter
+    provider = importer.import_module(providerName)                  # Import the adapter
     sendRes = provider.send(data, apiKey)                            # Try to send emails
     successfulSends.extend(sendRes['successes'])                     # Update successful sends
     remainingReceivers = [obj['mail'] for obj in sendRes['errors']]  # Update remaining emails
+    data['to'] = remainingReceivers
     senderInformation.append({'provider'  : providerName,            # Store info about this provider
                               'successes' : len(sendRes['successes']),
                               'errors'    : len(sendRes['errors'])})
@@ -28,6 +48,7 @@ def sanitize(data):
   clean['to'] = [] if tmpTo == '' else tmpTo.split(',')
   clean['subject'] = data.get('subject', '')
   clean['message'] = data.get('message', '')
+  clean['message'] = ' ' if clean['message'] == '' else clean['message']
   return clean
 
 def isValid(data):
