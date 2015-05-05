@@ -1,6 +1,5 @@
 from flask import Flask, send_from_directory, render_template, request, jsonify
-import json
-import sys
+from emailhelper import EmailDataHandler, EmailSender
 
 app = Flask(__name__)
 
@@ -10,30 +9,35 @@ def index():
 
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
+  # Providers
+  providers = [
+    ('emailproviders.mandrillprovider', app.config['MANDRILL_API_KEY']),
+    ('emailproviders.mailgun', app.config['MAILGUN_API_KEY'])
+  ]
 
-  info = dict({
-    'from'    : request.form['EMAIL_FROM'],
-    'to'      : request.form['EMAIL_TO'].split(','),
-    'subject' : request.form['EMAIL_SUBJECT'],
-    'message' : request.form['EMAIL_MESSAGE']
-  })
+  # Verify that all required post variables are present
+  dataHandler = EmailDataHandler(
+    request.form.get('email_from', ''),
+    request.form.get('email_to', ''),
+    request.form.get('email_subject', ''),
+    request.form.get('email_message', '')
+  )
 
-  # try:
-  #   import mailgunsender
-  #   response = mailgunsender.send(info, apiKey=app.config['MAILGUN_API_KEY'])
-  #   return response
-  # except:
-  #   return json.dumps({'lol' : str(sys.exc_info()[0])})
-  #   pass
+  # Check the posted data for errors
+  validationErrors = dataHandler.getErrors()
+  if validationErrors is not None:
+    return jsonify({'status': 'error', 'reason': 'validation', 'error': validationErrors})
 
-  # try:
-  #   import mandrillsender
-  #   response = mandrillsender.send(info, apiKey=app.config['MAILGUN_API_KEY'])
-  #   return jsonify(response)
-  # except:
-  #   # TODO Try next service
-  #   pass
+  # The data is valid, send emails
+  emailSender = EmailSender(dataHandler, providers)
+  res = emailSender.send()
 
+  # Check for errors
+  if not res['errors']:
+    # All emails sent successfully
+    return jsonify({'status': 'success'})
+  else:
+    return jsonify({'status': 'error', 'reason': 'email', 'failed': res['errors']})
 
 @app.route('/<path:filename>')
 def resources(filename):
