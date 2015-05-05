@@ -1,53 +1,63 @@
 from validate_email import validate_email
 
 
-def sanitize(data):
-  """
-  Sanitizes the data by stripping whitespace and adding missing
-  values. The only keys of concern are 'from', 'to', 'subject', 
-  and 'message'.
-  """
-  clean = dict()
-  clean['from'] = data.get('from', '').strip()
-  tmpTo = data.get('to', '').strip()
-  clean['to'] = [] if tmpTo == '' else tmpTo.split(',')
-  clean['subject'] = data.get('subject', '')
-  clean['message'] = data.get('message', '')
-  clean['message'] = ' ' if clean['message'] == '' else clean['message']
-  return clean
+class EmailDataHandler:
+  def __init__(self, sender, receivers, subject, message):
+    self.sender    = sender
+    self.receivers = receivers
+    self.subject   = subject
+    self.message   = message
+
+    self._sanitize()
 
 
-def isValid(data):
-  """
-  Validates the data given. Expected keys are 'from', 'to', 
-  'subject', and 'message'. If no errors are detected, the
-  function returns None. If errors are detected, a dict
-  containing the same keys as the input data is returned. 
-  Each key is pointing to a list of strings representing 
-  the error of the given key's value.
-  """
-  anyErrors = False
-  error = {'from' : [], 'to' : [], 'subject' : [], 'message' : []}
-  requiredFields = ['from', 'to']
+  def _sanitize(self):
+    """
+    Sanitizes the data by stripping whitespace and adding missing
+    values.
+    """
+    self.sender = self.sender.strip()
 
-  # Check if required fields are filled out
-  for field in requiredFields:
-    if not data[field]:
-      error[field].append('Required')
-      anyErrors = True
+    self.receivers = self.receivers.strip()
+    if self.receivers == '':
+      self.receivers = []
+    else:
+      self.receivers = self.receivers.split(',')
 
-  # Validate the 'from' address
-  if len(error['from']) == 0 and not validate_email(data['from']):
-    error['from'].append('Invalid email')
-    anyErrors = True
+    self.subject = self.subject.strip()
 
-  # Validate the 'to' addresses
-  for email in data['to']:
-    if not validate_email(email):
-      error['to'].append({'email' : email, 'reason' : 'Invalid email'})
-      anyErrors = True
+    self.message = self.message.strip()
+    if self.message == '':
+      self.message = ' '  # The providers can not send empty emails
 
-  if anyErrors:
-    return error
 
-  return None
+  def getErrors(self):
+    """
+    Searches the data for errors. If no errors are detected, 
+    None is returned. If one or more errors are detected, a list
+    of errors are returned
+    """
+    def addError(errors, name, err):
+      tmp = errors.get(name, list())
+      tmp.append(err)
+      errors[name] = tmp
+
+    errors = dict()
+
+    if not self.sender:
+      addError(errors, 'sender', 'Required')
+
+    if not self.receivers:
+      addError(errors, 'receivers', 'Required')
+
+    if not errors.get('sender', []) and not validate_email(self.sender):
+      addError(errors, 'sender', 'Invalid email')
+
+    for receiver in self.receivers:
+      if not validate_email(receiver):
+        addError(errors, 'receivers', {'email': receiver, 'reason': 'Invalid email'})
+
+    if errors:
+      return errors
+    else:
+      return None
