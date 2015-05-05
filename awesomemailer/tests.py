@@ -2,6 +2,7 @@
 import unittest
 from mock import Mock
 import json
+import validation
 
 import utils
 
@@ -20,7 +21,7 @@ class ValidationTestCase(unittest.TestCase):
 
   def test_validateValidSingleTo(self):
     data = {'from' : self.mail1, 'to' : [self.mail1], 'subject' : '', 'message' : ''}
-    self.assertIsNone(utils.isValid(data))
+    self.assertIsNone(validation.isValid(data))
 
 
   def test_validateValidMultipleTo(self):
@@ -28,24 +29,24 @@ class ValidationTestCase(unittest.TestCase):
             'to' : [self.mail1, self.mail2, self.mail3], 
             'subject' : '', 
             'message' : ''}
-    self.assertIsNone(utils.isValid(data))
+    self.assertIsNone(validation.isValid(data))
 
 
   def test_validateInvalidEmptyFrom(self):
     data = {'from' : '', 'to' : [self.mail1], 'subject' : '', 'message' : ''}
-    res = utils.isValid(data)
+    res = validation.isValid(data)
     self.assertTrue('Required' in res['from'])
 
 
   def test_validateInvalidEmptyTo(self):
     data = {'from' : 'from_email@example.com', 'to' : [], 'subject' : '', 'message' : ''}
-    res = utils.isValid(data)
+    res = validation.isValid(data)
     self.assertTrue('Required' in res['to'])
 
 
   def test_validateInvalidInvalidFrom(self):
     data = {'from' : self.invalidMail1, 'to' : [self.mail1], 'subject' : '', 'message' : ''}
-    res = utils.isValid(data)
+    res = validation.isValid(data)
     self.assertTrue('Invalid email' in res['from'])
 
 
@@ -54,7 +55,7 @@ class ValidationTestCase(unittest.TestCase):
             'to' : [self.invalidMail1, self.invalidMail2], 
             'subject' : '', 
             'message' : ''}
-    res = utils.isValid(data)
+    res = validation.isValid(data)
     self.assertEqual(len(res['to']), 2)
     self.assertEqual(res['to'][0]['email'], self.invalidMail1)
     self.assertEqual(res['to'][0]['reason'], 'Invalid email')
@@ -67,7 +68,7 @@ class ValidationTestCase(unittest.TestCase):
             'to' : [self.invalidMail1, self.mail1], 
             'subject' : '', 
             'message' : ''}
-    res = utils.isValid(data)
+    res = validation.isValid(data)
     self.assertEqual(len(res['to']), 1)
     self.assertEqual(res['to'][0]['email'], self.invalidMail1)
     self.assertEqual(res['to'][0]['reason'], 'Invalid email')
@@ -83,7 +84,7 @@ class SanitizerTestCase(unittest.TestCase):
 
 
   def test_sanitizeTooFewArgs(self):
-    res = utils.sanitize({})
+    res = validation.sanitize({})
     self.assertTrue('from' in res)
     self.assertTrue('to' in res)
     self.assertTrue('subject' in res)
@@ -91,7 +92,7 @@ class SanitizerTestCase(unittest.TestCase):
 
 
   def test_sanitizeEmptyListForTo(self):
-    res = utils.sanitize({})
+    res = validation.sanitize({})
     self.assertTrue(type(res['to']) is list)
     self.assertEqual(len(res['to']), 0)
 
