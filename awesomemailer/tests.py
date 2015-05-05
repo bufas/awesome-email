@@ -3,8 +3,7 @@ import unittest
 from mock import Mock
 import json
 
-import validation
-from emailhelper import EmailSender
+from emailhelper import EmailSender, EmailDataHandler
 
 class ValidationTestCase(unittest.TestCase):
   def setUp(self):
@@ -20,37 +19,37 @@ class ValidationTestCase(unittest.TestCase):
 
 
   def test_validateValidSingleTo(self):
-    dataHandler = validation.EmailDataHandler(self.mail1, self.mail1, '', '')
+    dataHandler = EmailDataHandler(self.mail1, self.mail1, '', '')
     self.assertIsNone(dataHandler.getErrors())
 
 
   def test_validateValidMultipleTo(self):
     receivers = ','.join([self.mail1, self.mail2, self.mail3])
-    dataHandler = validation.EmailDataHandler(self.mail1, receivers, '', '')
+    dataHandler = EmailDataHandler(self.mail1, receivers, '', '')
     self.assertIsNone(dataHandler.getErrors())
 
 
   def test_validateInvalidEmptyFrom(self):
-    dataHandler = validation.EmailDataHandler('', self.mail1, '', '')
+    dataHandler = EmailDataHandler('', self.mail1, '', '')
     res = dataHandler.getErrors()
     self.assertTrue('Required' in res['sender'])
 
 
   def test_validateInvalidEmptyTo(self):
-    dataHandler = validation.EmailDataHandler(self.mail1, '', '', '')
+    dataHandler = EmailDataHandler(self.mail1, '', '', '')
     res = dataHandler.getErrors()
     self.assertTrue('Required' in res['receivers'])
 
 
   def test_validateInvalidInvalidFrom(self):
-    dataHandler = validation.EmailDataHandler(self.invalidMail1, self.mail1, '', '')
+    dataHandler = EmailDataHandler(self.invalidMail1, self.mail1, '', '')
     res = dataHandler.getErrors()
     self.assertTrue('Invalid email' in res['sender'])
 
 
   def test_validateInvalidInvalidToAll(self):
     receivers = ','.join([self.invalidMail1, self.invalidMail2])
-    dataHandler = validation.EmailDataHandler(self.mail1, receivers, '', '')
+    dataHandler = EmailDataHandler(self.mail1, receivers, '', '')
     res = dataHandler.getErrors()
     self.assertEqual(len(res['receivers']), 2)
     self.assertEqual(res['receivers'][0]['email'], self.invalidMail1)
@@ -61,7 +60,7 @@ class ValidationTestCase(unittest.TestCase):
 
   def test_validateInvalidInvalidToSubset(self):
     receivers = ','.join([self.invalidMail1, self.mail1])
-    dataHandler = validation.EmailDataHandler(self.mail1, receivers, '', '')
+    dataHandler = EmailDataHandler(self.mail1, receivers, '', '')
     res = dataHandler.getErrors()
     self.assertEqual(len(res['receivers']), 1)
     self.assertEqual(res['receivers'][0]['email'], self.invalidMail1)
@@ -78,13 +77,13 @@ class SanitizerTestCase(unittest.TestCase):
 
 
   def test_sanitizeNoReceivers(self):
-    dataHandler = validation.EmailDataHandler('', '', '', '')
+    dataHandler = EmailDataHandler('', '', '', '')
     self.assertTrue(type(dataHandler.receivers) is list)
     self.assertEqual(len(dataHandler.receivers), 0)
 
 
   def test_sanitizeMessageNotEmpty(self):
-    dataHandler = validation.EmailDataHandler('', '', '', '')
+    dataHandler = EmailDataHandler('', '', '', '')
     self.assertFalse(not dataHandler.message)
 
 
@@ -111,7 +110,7 @@ class EmailSenderTestCase(unittest.TestCase):
 
   def test_singleProvider(self):
     receivers = ','.join(['c@d.com', 'e@f.com'])
-    dataHandler = validation.EmailDataHandler('a@b.com', receivers, '', '')
+    dataHandler = EmailDataHandler('a@b.com', receivers, '', '')
     providerreturn = {'successes': ['c@d.com', 'e@f.com'], 'errors': []}
 
     mockprovider = self.makeProviderMock(providerreturn)
@@ -126,7 +125,7 @@ class EmailSenderTestCase(unittest.TestCase):
 
   def test_onlyUsedProvidersAreLoaded(self):
     receivers = ','.join(['c@d.com', 'e@f.com'])
-    dataHandler = validation.EmailDataHandler('a@b.com', receivers, '', '')
+    dataHandler = EmailDataHandler('a@b.com', receivers, '', '')
     providerreturn = {'successes': ['c@d.com', 'e@f.com'], 'errors': []}
 
     mockprovider = self.makeProviderMock(providerreturn)
@@ -140,7 +139,7 @@ class EmailSenderTestCase(unittest.TestCase):
 
   def test_whenFirstProviderFailsTheSecondKicksIn(self):
     receivers = ','.join(['c@d.com', 'e@f.com'])
-    dataHandler = validation.EmailDataHandler('a@b.com', receivers, '', '')
+    dataHandler = EmailDataHandler('a@b.com', receivers, '', '')
     providerreturn1 = {'successes':[], 
                        'errors':[{'mail':'c@d.com','reason':''}, {'mail':'e@f.com','reason':''}]}
     providerreturn2 = {'successes':['c@d.com', 'e@f.com'], 'errors':[]}
@@ -158,7 +157,7 @@ class EmailSenderTestCase(unittest.TestCase):
 
   def test_sendEmailMultipleProvidersFirstFailsSome(self):
     receivers = ','.join(['c@d.com', 'e@f.com', 'g@h.com'])
-    dataHandler = validation.EmailDataHandler('a@b.com', receivers, '', '')
+    dataHandler = EmailDataHandler('a@b.com', receivers, '', '')
     providerreturn1 = {'successes':['c@d.com'], 
                        'errors':[{'mail':'e@f.com','reason':''}, {'mail':'g@h.com','reason':''}]}
     providerreturn2 = {'successes':['e@f.com', 'g@h.com'], 'errors':[]}
