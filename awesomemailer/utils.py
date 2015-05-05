@@ -21,6 +21,27 @@ class CustomProviderImporter:
     return provider
 
 def sendEmails(data, providers, importer=importlib):
+  """
+  Sends emails using the providers. If a provider fails to send 
+  all the emails, the next provider in the list is used to send 
+  the remaining emails. A dict containing some diagnostics is 
+  returned to inform to caller of broken services.
+
+  Arguments:
+  data -- dict containing the email data
+  providers -- a list of tuples containg the name of an email 
+    providers and an API key.
+
+  Keyword arguments:
+  importer -- a module or class which can import at module given
+    its name as a string (default: importlib).
+
+  Return value:
+  Returns a dict containing a list of emails which was 
+  successfully sent to, a list of emails which failed, and a 
+  list of which providers were used as well as how many emails 
+  they successfully sent and failed.
+  """
   successfulSends = []
   remainingReceivers = data['to']
   senderInformation = []
@@ -42,6 +63,11 @@ def sendEmails(data, providers, importer=importlib):
           'senders'   : senderInformation}
 
 def sanitize(data):
+  """
+  Sanitizes the data by stripping whitespace and adding missing
+  values. The only keys of concern are 'from', 'to', 'subject', 
+  and 'message'.
+  """
   clean = dict()
   clean['from'] = data.get('from', '').strip()
   tmpTo = data.get('to', '').strip()
@@ -52,6 +78,14 @@ def sanitize(data):
   return clean
 
 def isValid(data):
+  """
+  Validates the data given. Expected keys are 'from', 'to', 
+  'subject', and 'message'. If no errors are detected, the
+  function returns None. If errors are detected, a dict
+  containing the same keys as the input data is returned. 
+  Each key is pointing to a list of strings representing 
+  the error of the given key's value.
+  """
   anyErrors = False
   error = {'from' : [], 'to' : [], 'subject' : [], 'message' : []}
   requiredFields = ['from', 'to']
