@@ -1,23 +1,5 @@
 import importlib
 
-class CustomProviderImporter:
-  """
-  Imports email providers and returns them. It has the same interface
-  as importlib, which means importlib can simply be used in its place.
-  This is mainly for testing.
-  """
-  def __init__(self):
-    self.importedProviders = {}
-
-  def import_module(self, providerName):
-    # If the provider has been loaded before, just return it
-    if providerName in self.importedProviders:
-      return self.importedProviders[providerName]
-
-    # Load the provider
-    provider = importlib.import_module(providerName)
-    self.importedProviders[providerName] = provider
-    return provider
 
 def sendEmails(dataHandler, providers, importer=importlib):
   """

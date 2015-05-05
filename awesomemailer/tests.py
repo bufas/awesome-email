@@ -104,7 +104,7 @@ class EmailSenderTestCase(unittest.TestCase):
 
 
   def makeImporterMock(self, providerMocks):
-    mock = utils.CustomProviderImporter()
+    mock = Mock()
     mock.import_module = Mock(side_effect=providerMocks)
     return mock
 
@@ -170,21 +170,6 @@ class EmailSenderTestCase(unittest.TestCase):
     self.assertEquals(res['senders'][0]['errors'], 2)
     self.assertEquals(res['senders'][1]['successes'], 2)
     self.assertEquals(res['senders'][1]['errors'], 0)
-
-
-class ProviderImporterTestCase(unittest.TestCase):
-  def setUp(self):
-    pass
-
-
-  def tearDown(self):
-    pass
-
-
-  def test_customProviderImporter(self):
-    importer = utils.CustomProviderImporter()
-    provider = importer.import_module('emailproviders.mailgun')
-    self.assertTrue(hasattr(provider, 'send'))
 
 
 # class AwesomeMailerTestCase(unittest.TestCase):
