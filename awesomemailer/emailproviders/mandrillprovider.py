@@ -1,7 +1,13 @@
 import mandrill
 import requests
 
+"""
+Sends emails using the Mandrill service.
+https://mandrillapp.com
+"""
+
 def send(data, apiKey=None):
+  """See __init__.py for documentation"""
   acceptedStatuses = ['sent', 'queued', 'scheduled']
 
   successMails = []

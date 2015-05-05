@@ -1,6 +1,12 @@
 import requests
 
+"""
+Sends emails using the Mailgun service.
+https://mailgun.com
+"""
+
 def send(data, apiKey=None):
+  """See __init__.py for documentation"""
   receiverString = ','.join(data['to'])
 
   successList = []
