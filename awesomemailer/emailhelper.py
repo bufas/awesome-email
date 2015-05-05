@@ -57,15 +57,10 @@ class EmailSender:
       provider = self.importer.import_module(providerName)
 
       # Prepare data for the email providers
-      data = {
-        'from'    : self.dataHandler.sender,
-        'to'      : remainingReceivers,
-        'subject' : self.dataHandler.subject,
-        'message' : self.dataHandler.message
-      }
+      self.dataHandler.receivers = remainingReceivers
 
       # Send emails using provider
-      res = provider.send(data, apiKey)
+      res = provider.send(self.dataHandler, apiKey)
 
       # Update successful and pending email lists
       successList.extend(res['successes'])
@@ -111,6 +106,11 @@ class EmailDataHandler:
     self.message = self.message.strip()
     if self.message == '':
       self.message = ' '  # The providers can not send empty emails
+
+
+  def getReceiversAsString(self):
+    """Returns the reciver list as a comma separated string"""
+    return ','.join(self.receivers)
 
 
   def getErrors(self):

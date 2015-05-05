@@ -16,10 +16,10 @@ def send(data, apiKey=None):
   try:
     mandrill_client = mandrill.Mandrill(apiKey)
 
-    message = dict({'from_email' : data['from'],
-                    'subject'    : data['subject'],
-                    'text'       : data['message'],
-                    'to'         : [{'email' : mail} for mail in data['to']]})
+    message = dict({'from_email' : data.sender,
+                    'subject'    : data.subject,
+                    'text'       : data.message,
+                    'to'         : [{'email' : mail} for mail in data.receivers]})
 
     result = mandrill_client.messages.send(message=message)
 
@@ -28,8 +28,8 @@ def send(data, apiKey=None):
                   for r in result if r['status'] not in acceptedStatuses]
 
   except mandrill.Error as e:
-    errorMails = [{'mail' : mail, 'reason' : str(e)} for mail in data['to']]
+    errorMails = [{'mail' : mail, 'reason' : str(e)} for mail in data.receivers]
   except requests.exceptions.ConnectionError as e:
-    errorMails = [{'mail' : mail, 'reason' : 'ConnectionError'} for mail in data['to']]
+    errorMails = [{'mail' : mail, 'reason' : 'ConnectionError'} for mail in data.receivers]
 
   return {'successes' : successMails, 'errors' : errorMails}

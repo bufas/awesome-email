@@ -4,8 +4,9 @@ python:
 install:
 - pip install -r requirements.txt
 script:
-- python awesomemailer/tests.py
-- python awesomemailer/emailproviders/tests.py
+- cd awesomemailer/
+- python -m tests
+- python -m emailproviders.tests
 deploy:
   provider: heroku
   api_key:
