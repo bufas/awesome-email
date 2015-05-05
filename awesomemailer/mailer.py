@@ -26,7 +26,7 @@ def send_mail():
   # Check the posted data for errors
   validationErrors = dataHandler.getErrors()
   if validationErrors is not None:
-    return jsonify({'status': 'error', 'reason': 'validation', 'error': validationErrors})
+    return jsonify({'status': 'error', 'reason': 'validation', 'errors': validationErrors})
 
   # The data is valid, send emails
   emailSender = EmailSender(dataHandler, providers)
