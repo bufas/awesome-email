@@ -77,6 +77,11 @@ class EmailSender:
       self.providerInfo[providerName]['successes'] += len(res['successes'])
       self.providerInfo[providerName]['errors'] += len(res['errors'])
 
+      # Update database
+      providerModel.successes += len(res['successes'])
+      providerModel.errors += len(res['errors'])
+      providerModel.save()
+
       # Log
       if not res['successes']:
         self.log('Complete failure no email sent')

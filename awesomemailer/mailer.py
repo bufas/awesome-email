@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, render_template, request, jsonify
+from flask import Flask, send_from_directory, render_template, request, jsonify, abort
 from flask.ext.sqlalchemy import SQLAlchemy
 from emaildatahandler import EmailDataHandler
 from emailsender import EmailSender
@@ -30,6 +30,11 @@ def index():
 
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
+  # Fetch providers, and abort if there are none available
+  providers = ProviderModel.getAllByRank()
+  if providers is None:
+    abort(503)  # Service temporarily unavailable
+
   # Verify that all required post variables are present
   dataHandler = EmailDataHandler(
     request.form.get('email_from', ''),
@@ -44,7 +49,6 @@ def send_mail():
     return jsonify({'status': 'error', 'reason': 'validation', 'errors': validationErrors})
 
   # The data is valid, send emails
-  providers = ProviderModel.getAllByRank()
   emailSender = EmailSender(dataHandler, providers, logger=app.logger)
   res = emailSender.send()
 

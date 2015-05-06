@@ -1,3 +1,5 @@
+import sqlalchemy
+
 from mailer import db
 
 
@@ -19,9 +21,16 @@ class ProviderModel(db.Model):
     self.rank      = rank
 
 
+  def save(self):
+    db.session.commit()
+
+
   @classmethod
   def getAllByRank(cls):
-    return cls.query.order_by('rank').all()
+    try:
+      return cls.query.order_by('rank').all()
+    except sqlalchemy.exc.SQLAlchemyError as e:
+      return None
 
 
   def __repr__(self):
