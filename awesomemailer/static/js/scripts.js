@@ -16,7 +16,10 @@ $(function () {
   $.validate({
     modules : 'html5',
     onSuccess : function() {
+      $('#submit_button').val('Sending emails');
       $.post('/send_mail', $('#emailForm').serialize(), function (data) {
+        $('#submit_button').val('Submit');
+
         var status = $('#status');
         var extra_info = $('#extra_error_info');
         status.empty();
