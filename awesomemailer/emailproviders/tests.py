@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from emailhelper import EmailDataHandler
+from emaildatahandler import EmailDataHandler
 
 import mailgun
 import mandrillprovider as mandrill
