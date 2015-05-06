@@ -28,10 +28,7 @@ def index():
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
   # Providers
-  providers = []
-  providerModels = ProviderModel.query.order_by('rank').all()
-  for providerModel in providerModels:
-    providers.append((providerModel.name, providerModel.key))
+  providers = [(p.name, p.key) for p in ProviderModel.query.order_by('rank').all()]
 
   # Verify that all required post variables are present
   dataHandler = EmailDataHandler(
