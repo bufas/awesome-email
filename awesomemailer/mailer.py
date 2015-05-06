@@ -1,7 +1,14 @@
 from flask import Flask, send_from_directory, render_template, request, jsonify
 from emailhelper import EmailDataHandler, EmailSender
+import logging
 
 app = Flask(__name__)
+app.config.from_object('config_prod')
+
+stream_handler = logging.StreamHandler()
+app.logger.addHandler(stream_handler)
+app.logger.setLevel(logging.INFO)
+app.logger.info('App started')
 
 @app.route('/')
 def index():
@@ -44,5 +51,4 @@ def resources(filename):
   return send_from_directory('static', filename)
 
 if __name__ == '__main__':
-  app.config.from_object('config_prod')
   app.run()

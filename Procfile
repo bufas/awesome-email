@@ -1,1 +1,1 @@
-web: gunicorn awesomemailer.mailer:app --log-file -
+web: gunicorn --pythonpath awesomemailer mailer:app --log-file -
