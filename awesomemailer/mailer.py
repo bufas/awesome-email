@@ -8,7 +8,6 @@ app.config.from_object('config_prod')
 stream_handler = logging.StreamHandler()
 app.logger.addHandler(stream_handler)
 app.logger.setLevel(logging.INFO)
-app.logger.info('App started')
 
 @app.route('/')
 def index():
@@ -36,7 +35,7 @@ def send_mail():
     return jsonify({'status': 'error', 'reason': 'validation', 'errors': validationErrors})
 
   # The data is valid, send emails
-  emailSender = EmailSender(dataHandler, providers)
+  emailSender = EmailSender(dataHandler, providers, logger=app.logger)
   res = emailSender.send()
 
   # Check for errors

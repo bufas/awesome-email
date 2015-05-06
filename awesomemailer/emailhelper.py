@@ -1,9 +1,10 @@
 import importlib
 from validate_email import validate_email
+import flask
 
 
 class EmailSender:
-  def __init__(self, dataHandler, providers, importer=importlib):
+  def __init__(self, dataHandler, providers, importer=importlib, logger=None):
     """
     Arguments:
     dataHandler -- a dataHandler containing the email data
@@ -16,6 +17,7 @@ class EmailSender:
     self.providers = providers
     self.importer = importer
     self.providerInfo = {}
+    self.logger = logger
 
 
   def getProviderInfo(self, name=None):
@@ -51,8 +53,12 @@ class EmailSender:
     """
     successList = []
 
+    self.log('Sending to {}'.format(','.join(self.dataHandler.receivers)))
+
     remainingReceivers = self.dataHandler.receivers
     for providerName, apiKey in self.providers:
+      self.log('Trying provider {}'.format(providerName))
+
       # Import the provider
       provider = self.importer.import_module(providerName)
 
@@ -71,11 +77,33 @@ class EmailSender:
       self.providerInfo[providerName]['successes'] += len(res['successes'])
       self.providerInfo[providerName]['errors'] += len(res['errors'])
 
+      # Log
+      if not res['successes']:
+        self.log('Complete failure no email sent')
+      else:
+        if res['errors']:
+          self.log('Successfully sent to {}'.format(','.join(res['successes'])))
+          for err in res['errors']:
+            self.log('Failed to send to {} : {}'.format(err['mail'], err['reason']))
+        else:
+          self.log('Successfully sent to all')
+
       # Break if all mails are sent
       if not res['errors']:
         break
 
+    # More logging
+    if not remainingReceivers:
+      self.log('All emails sent')
+    else:
+      self.logger.info('success/failure = {}/{}'.format(len(successList), len(remainingReceivers)))
+
     return {'successes': successList, 'errors': remainingReceivers}
+
+
+  def log(self, msg):
+    if self.logger is not None:
+      self.logger.info('[EmailSender] {}'.format(msg))
 
 
 class EmailDataHandler:
