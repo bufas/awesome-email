@@ -54,7 +54,9 @@ class EmailSender:
     self.log('Sending to {}'.format(','.join(self.dataHandler.receivers)))
 
     remainingReceivers = self.dataHandler.receivers
-    for providerName, apiKey in self.providers:
+    for providerModel in self.providers:
+      providerName = providerModel.name
+
       self.log('Trying provider {}'.format(providerName))
 
       # Import the provider
@@ -64,7 +66,7 @@ class EmailSender:
       self.dataHandler.receivers = remainingReceivers
 
       # Send emails using provider
-      res = provider.send(self.dataHandler, apiKey)
+      res = provider.send(self.dataHandler, providerModel.key)
 
       # Update successful and pending email lists
       successList.extend(res['successes'])

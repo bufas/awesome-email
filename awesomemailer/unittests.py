@@ -3,6 +3,7 @@ from mock import Mock
 
 from emaildatahandler import EmailDataHandler
 from emailsender import EmailSender
+from mailer import ProviderModel
 
 
 class ValidationTestCase(unittest.TestCase):
@@ -116,7 +117,9 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider = self.makeProviderMock(providerreturn)
     mockimporter = self.makeImporterMock([mockprovider])
 
-    sender = EmailSender(dataHandler, [('name', 'key')], importer=mockimporter)
+    providerModel = ProviderModel('name', 'key')
+
+    sender = EmailSender(dataHandler, [providerModel], importer=mockimporter)
     res = sender.send()
 
     self.assertEquals(len(res['successes']), 2)
@@ -131,7 +134,10 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider = self.makeProviderMock(providerreturn)
     mockimporter = self.makeImporterMock([mockprovider])
 
-    sender = EmailSender(dataHandler, [('name1', 'key'), ('name2', 'key')], importer=mockimporter)
+    providerModel1 = ProviderModel('name1', 'key')
+    providerModel2 = ProviderModel('name2', 'key')
+
+    sender = EmailSender(dataHandler, [providerModel1, providerModel2], importer=mockimporter)
     res = sender.send()
 
     self.assertEquals(len(res['successes']), 2)
@@ -148,7 +154,10 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider2 = self.makeProviderMock(providerreturn2)
     mockimporter = self.makeImporterMock([mockprovider1, mockprovider2])
 
-    sender = EmailSender(dataHandler, [('name1', 'key'), ('name2', 'key')], importer=mockimporter)
+    providerModel1 = ProviderModel('name1', 'key')
+    providerModel2 = ProviderModel('name2', 'key')
+
+    sender = EmailSender(dataHandler, [providerModel1, providerModel2], importer=mockimporter)
     res = sender.send()
 
     self.assertEquals(sender.getProviderInfo(name='name1')['errors'], 2)
@@ -166,7 +175,10 @@ class EmailSenderTestCase(unittest.TestCase):
     mockprovider2 = self.makeProviderMock(providerreturn2)
     mockimporter = self.makeImporterMock([mockprovider1, mockprovider2])
 
-    sender = EmailSender(dataHandler, [('name1', 'key'), ('name2', 'key')], importer=mockimporter)
+    providerModel1 = ProviderModel('name1', 'key')
+    providerModel2 = ProviderModel('name2', 'key')
+
+    sender = EmailSender(dataHandler, [providerModel1, providerModel2], importer=mockimporter)
     res = sender.send()
 
     provider1info = sender.getProviderInfo(name='name1')

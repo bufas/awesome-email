@@ -30,9 +30,6 @@ def index():
 
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
-  # Providers
-  providers = [(p.name, p.key) for p in ProviderModel.query.order_by('rank').all()]
-
   # Verify that all required post variables are present
   dataHandler = EmailDataHandler(
     request.form.get('email_from', ''),
@@ -47,6 +44,7 @@ def send_mail():
     return jsonify({'status': 'error', 'reason': 'validation', 'errors': validationErrors})
 
   # The data is valid, send emails
+  providers = ProviderModel.getAllByRank()
   emailSender = EmailSender(dataHandler, providers, logger=app.logger)
   res = emailSender.send()
 
