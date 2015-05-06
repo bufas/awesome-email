@@ -1,9 +1,20 @@
 from flask import Flask, send_from_directory, render_template, request, jsonify
+from flask.ext.sqlalchemy import SQLAlchemy
 from emailhelper import EmailDataHandler, EmailSender
 import logging
+import os
 
 app = Flask(__name__)
-app.config.from_object('config_prod')
+
+# Load the correct configuration
+if os.environ.get('TESTING', False):
+  app.config.from_object('config_test')
+else:
+  app.config.from_object('config_prod')
+
+db = SQLAlchemy(app)
+
+from model import ProviderModel
 
 stream_handler = logging.StreamHandler()
 app.logger.addHandler(stream_handler)
@@ -13,13 +24,14 @@ app.logger.setLevel(logging.INFO)
 def index():
   return render_template('index.html')
 
+
 @app.route('/send_mail', methods=['POST'])
 def send_mail():
   # Providers
-  providers = [
-    ('emailproviders.mandrillprovider', app.config['MANDRILL_API_KEY']),
-    ('emailproviders.mailgun', app.config['MAILGUN_API_KEY'])
-  ]
+  providers = []
+  providerModels = ProviderModel.query.order_by('rank').all()
+  for providerModel in providerModels:
+    providers.append((providerModel.name, providerModel.key))
 
   # Verify that all required post variables are present
   dataHandler = EmailDataHandler(

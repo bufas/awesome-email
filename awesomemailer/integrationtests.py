@@ -1,13 +1,29 @@
 import unittest
+import json
+import os
 
 import mailer
-import json
+from model import ProviderModel
 
 
 class AwesomemailerTestCase(unittest.TestCase):
   def setUp(self):
     mailer.app.config.from_object('config_test');
     self.app = mailer.app.test_client()
+
+    # Setup database
+    mailer.db.create_all()
+    p1 = ProviderModel('emailproviders.mandrillprovider', os.environ['MANDRILL_API_KEY_TEST'], 0, 0, 1)
+    p2 = ProviderModel('emailproviders.mailgun', os.environ['MAILGUN_API_KEY_TEST'], 0, 0, 2)
+    mailer.db.session.add(p1)
+    mailer.db.session.add(p2)
+    mailer.db.session.commit()
+
+
+  def tearDown(self):
+    # Clear database
+    mailer.db.session.remove()
+    mailer.db.drop_all()
 
 
   def test_singleReceiver(self):

@@ -3,3 +3,5 @@ mandrill==1.0.57
 gunicorn==19.3.0
 validate-email==1.3
 mock==1.0.1
+psycopg2==2.6
+SQLAlchemy==1.0.3
