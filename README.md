@@ -33,7 +33,7 @@ If I had an infinite amount of time
 - I would implement a small control panel where email service providers can be managed (enabled/disabled) and inspected (number of successes/errors).
 - I would set up webhooks to get notified when emails are received/bounced/opened/clicked/etc. and notify the user. [Firebase](https://www.firebase.com/) would probably be an awesome mechanism as the server-to-user notification system.
 - I would set up a database migration method as it is kinda bad how it is now. Should probably be done with [Flask Migrate](https://flask-migrate.readthedocs.org/en/latest/).
-- Write more thorough tests for the email service providers. Also, I would like a single test suite that can be run against all the service providers one by one. This will also make it easier for people who want to write their own providers.
+- I would write more thorough tests for the email service providers. Also, I would like a single test suite that can be run against all the service providers one by one. This will also make it easier for people who want to write their own providers.
 
 Email service provider interface
 --------------------------------
