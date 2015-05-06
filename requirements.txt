@@ -1,4 +1,5 @@
 Flask==0.10.1
+Flask-SQLAlchemy==2.0
 mandrill==1.0.57
 gunicorn==19.3.0
 validate-email==1.3
