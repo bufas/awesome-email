@@ -1,6 +1,8 @@
 from flask import Flask, send_from_directory, render_template, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
-from emailhelper import EmailDataHandler, EmailSender
+from emaildatahandler import EmailDataHandler
+from emailsender import EmailSender
+
 import logging
 import os
 

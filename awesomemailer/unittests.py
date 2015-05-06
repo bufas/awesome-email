@@ -1,7 +1,8 @@
 import unittest
 from mock import Mock
 
-from emailhelper import EmailSender, EmailDataHandler
+from emaildatahandler import EmailDataHandler
+from emailsender import EmailSender
 
 
 class ValidationTestCase(unittest.TestCase):
