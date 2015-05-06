@@ -20,6 +20,7 @@ stream_handler = logging.StreamHandler()
 app.logger.addHandler(stream_handler)
 app.logger.setLevel(logging.INFO)
 
+
 @app.route('/')
 def index():
   return render_template('index.html')
@@ -54,9 +55,6 @@ def send_mail():
   else:
     return jsonify({'status': 'error', 'reason': 'email', 'failed': res['errors']})
 
-@app.route('/<path:filename>')
-def resources(filename):
-  return send_from_directory('static', filename)
 
 if __name__ == '__main__':
   app.run()

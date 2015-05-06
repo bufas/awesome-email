@@ -37,7 +37,6 @@ $(function () {
         }
         else if (data.status == 'error' && data.reason == 'email') {
           // One or more emails were not sent
-          // TODO
           if (data.failed.length > 1) {
             status.text('Sending to the following receivers failed:');
             data.failed.forEach(function (e) {
