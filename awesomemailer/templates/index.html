@@ -11,34 +11,78 @@
 
     <div class="container">
 
-      <form id="email">
+      <form id="emailForm">
         <div class="row">
-          <div class="six columns">
+          <div class="twelve columns">
             <label for="input_from">From</label>
-            <input name="EMAIL_FROM" class="u-full-width" type="email" placeholder="" id="input_from">
+            <input 
+              name="email_from" 
+              class="u-full-width" 
+              type="email" 
+              placeholder="some_russian@email.ru" 
+              id="input_from"
+              required>
           </div>
+        </div>
 
-          <div class="six columns">
-            <label for="input_to">To</label>
-            <input name="EMAIL_TO" class="u-full-width" type="email" placeholder="" id="input_to">
+        <div class="row">
+          <div class="twelve columns">
+            <label for="input_to">To <span class="field_comment">(comma separated list of email addresses)</span></label>
+            <input 
+              name="email_to" 
+              class="u-full-width" 
+              type="text" 
+              placeholder="spam_receiver@email.com,random_guy@email.com" 
+              id="input_to"
+              required
+              data-validation="list_of_emails">
           </div>
         </div>
 
         <div class="row">
           <div class="twelve columns">
             <label for="input_subject">Subject</label>
-            <input name="EMAIL_SUBJECT" class="u-full-width" type="text" placeholder="" id="input_subject">
+            <input 
+              name="email_subject" 
+              class="u-full-width" 
+              type="text" 
+              placeholder="With due respect" 
+              id="input_subject"
+              required>
           </div>
         </div>
 
         <label for="input_message">Message</label>
-        <textarea name="EMAIL_MESSAGE" class="u-full-width" placeholder="" id="input_message"></textarea>
+        <textarea 
+          name="email_message" 
+          class="u-full-width" 
+          placeholder="Greetings,
+
+I know that this mail will come to you as a surprise as we have never met before, but need not to worry as I am contacting you independently of my investigation and no one is informed of this communication. I need your urgent Cooperation in transferring the sum of $11.3 Million dollars immediately to your private account.The money has been here in our Bank lying dormant for years now without anybody coming for the claim of it.
+
+The fund belong to our deceased Customer Mrs.Joy Lake who perished along with her family since January 31 2000. The Banking laws here does not allow such money to stay more than 16 years,that is the reason why i need your Cooperation in transferring the money to your bank account so that we can use it to secure the future of our both families because i don't want the money to be recalled to the bank treasury as unclaimed fund.
+
+By indicating your interest I will send you the full details on how the business will be executed. Please keep this proposal as a top secret and delete if you are not interested.
+
+Best Regards,
+[INSERT YOUR NAME]" 
+          id="input_message"
+          required></textarea>
 
         <input class="button-primary" type="submit" value="Submit">
       </form>
 
+      <div class="row">
+        <div class="twelve columns">
+          <span id="status"></span>
+          <div id="extra_error_info"></div>
+        </div>
+      </div>
+
     </div>
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.2.1/jquery.form-validator.min.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/scripts.js')}}"></script>
   </body>
 </html>

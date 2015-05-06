@@ -1,0 +1,9 @@
+textarea#input_message {
+  height: 200px;
+}
+
+.field_comment {
+   font-weight: 100; 
+   color: #999;
+   float: right;
+}
